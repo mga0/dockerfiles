@@ -28,15 +28,20 @@ RUN echo "@commuedge https://nl.alpinelinux.org/alpine/edge/community" >> /etc/a
     samba-dev" \
  && apk -U add \
     ${BUILD_DEPS} \
+    bash \
     nginx \
+    git \
     s6 \
     libressl \
     ca-certificates \
     libsmbclient \
+    util-linux \
     samba-client \
     su-exec \
     tzdata \
+    tmux \
     redis \
+    zsh \
     php7@commuedge \
     php7-fpm@commuedge \
     php7-intl@commuedge \
@@ -119,4 +124,10 @@ EXPOSE 8888
 LABEL description="A server software for creating file hosting services" \
       nextcloud="Nextcloud v${NEXTCLOUD_VERSION}"
 
-CMD ["run.sh"]
+RUN git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
+       && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
+       && sed -i '/root/s/zsh/sh/g' /etc/passwd\
+       && sed -i -E "s/^plugins=\((.*)\)$/plugins=(\1 git git-flow tmux)/" ~/.zshrc \
+       && echo $( which zsh )
+
+CMD ["/bin/zsh"]
